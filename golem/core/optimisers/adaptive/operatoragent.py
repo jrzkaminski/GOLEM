@@ -29,7 +29,9 @@ class ExperienceBuffer:
             self.log_result(ind)
 
     def log_result(self, result: Individual):
-        if result.uid in self._prev_pop or result.parent_operator.type_ != 'mutation':
+        if result.uid in self._prev_pop:
+            return
+        if not result.parent_operator or result.parent_operator.type_ != 'mutation':
             return
         self._next_pop.add(result.uid)
         obs = result.graph
