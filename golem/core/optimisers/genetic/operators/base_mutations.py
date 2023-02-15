@@ -188,9 +188,9 @@ def single_add_mutation(graph: OptGraph,
     :param graph: graph to mutate
     """
 
-    if graph.depth >= requirements.max_depth:
+    # if graph.depth >= requirements.max_depth:
         # add mutation is not possible
-        return graph
+        # return graph
 
     node_to_mutate = choice(graph.nodes)
 
