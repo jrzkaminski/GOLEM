@@ -3,11 +3,37 @@ from typing import Optional, Callable, Dict
 
 import networkx as nx
 import numpy as np
+import zss
 from networkx import graph_edit_distance
 
 from golem.core.optimisers.optimization_parameters import GraphRequirements
 from golem.metrics.graph_metrics import min_max
 from libs.netcomp import edit_distance
+
+
+def tree_edit_dist(target_graph: nx.DiGraph, graph: nx.DiGraph) -> float:
+    target_tree_root = _nx_to_zss_tree(target_graph)
+    cmp_tree_root = _nx_to_zss_tree(graph)
+    dist = zss.simple_distance(target_tree_root, cmp_tree_root)
+    return dist
+
+
+def _nx_to_zss_tree(graph: nx.DiGraph) -> zss.Node:
+    root = _get_root_node(graph)
+    tree = nx.dfs_tree(graph, source=root)
+    nodes_dict = {}
+    for edge in tree.edges():
+        if edge[0] not in nodes_dict:
+            nodes_dict[edge[0]] = zss.Node(edge[0])
+        if edge[1] not in nodes_dict:
+            nodes_dict[edge[1]] = zss.Node(edge[1])
+        nodes_dict[edge[0]].addkid(nodes_dict[edge[1]])
+    return nodes_dict[root]
+
+
+def _get_root_node(nxgraph: nx.DiGraph):
+    source = [n for (n, d) in nxgraph.in_degree() if d == 0][0]
+    return source
 
 
 def get_edit_dist_metric(target_graph: nx.DiGraph,
@@ -29,7 +55,7 @@ def get_edit_dist_metric(target_graph: nx.DiGraph,
                                   upper_bound=upper_bound,
                                   timeout=timeout.total_seconds() if timeout else None,
                                  )
-        return ged or upper_bound
+        return float(ged) or upper_bound
 
     return metric
 
