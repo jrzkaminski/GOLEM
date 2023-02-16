@@ -70,3 +70,10 @@ def matrix_edit_dist(target_graph: nx.DiGraph, graph: nx.DiGraph) -> float:
         adj.resize(shape)
     value = edit_distance(target_adj, adj)
     return value
+
+
+if __name__ == "__main__":
+    n = 30
+    g1 = nx.random_tree(n, create_using=nx.DiGraph)
+    g2 = nx.random_tree(n, create_using=nx.DiGraph)
+
