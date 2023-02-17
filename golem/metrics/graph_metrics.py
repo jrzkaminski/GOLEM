@@ -23,30 +23,6 @@ def degree_dist(target_graph: nx.DiGraph, graph: nx.DiGraph) -> float:
     return degree_stats([graph], [target_graph])
 
 
-def get_edit_dist_metric(target_graph: nx.DiGraph,
-                         timeout=timedelta(seconds=60),
-                         upper_bound: Optional[int] = None,
-                         requirements: Optional[GraphRequirements] = None,
-                         ) -> Callable[[nx.DiGraph], float]:
-    def node_match(node_content_1: Dict, node_content_2: Dict) -> bool:
-        operations_do_match = node_content_1.get('name') == node_content_2.get('name')
-        return True or operations_do_match
-
-    if requirements:
-        upper_bound = upper_bound or int(np.sqrt(requirements.max_depth * requirements.max_arity)),
-        timeout = timeout or requirements.max_graph_fit_time
-
-    def metric(graph: nx.DiGraph) -> float:
-        ged = graph_edit_distance(target_graph, graph,
-                                  node_match=node_match,
-                                  upper_bound=upper_bound,
-                                  timeout=timeout.seconds if timeout else None,
-                                 )
-        return ged or upper_bound
-
-    return metric
-
-
 def size_diff(target_graph: nx.DiGraph, graph: nx.DiGraph) -> float:
     nodes_diff = abs(target_graph.number_of_nodes() - graph.number_of_nodes())
     edges_diff = abs(target_graph.number_of_edges() - graph.number_of_edges())
