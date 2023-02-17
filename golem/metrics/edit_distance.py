@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import timedelta, datetime
 from typing import Optional, Callable, Dict
 
 import networkx as nx
@@ -72,8 +72,19 @@ def matrix_edit_dist(target_graph: nx.DiGraph, graph: nx.DiGraph) -> float:
     return value
 
 
+def try_tree_edit_distance():
+    for i, n in enumerate(range(10, 200, 10)):
+        g1 = nx.random_tree(n, create_using=nx.DiGraph)
+        g2 = nx.random_tree(n, create_using=nx.DiGraph)
+
+        start_time = datetime.now()
+        dist = tree_edit_dist(g1, g2)
+        duration = datetime.now() - start_time
+
+        print(f'iter {i} with size={n} dist={dist}, t={duration.total_seconds():.3f}s')
+
+
 if __name__ == "__main__":
-    n = 30
-    g1 = nx.random_tree(n, create_using=nx.DiGraph)
-    g2 = nx.random_tree(n, create_using=nx.DiGraph)
+    try_tree_edit_distance()
+
 
