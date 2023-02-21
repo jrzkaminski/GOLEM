@@ -1,5 +1,6 @@
+import operator
 from datetime import timedelta, datetime
-from typing import Optional, Callable, Dict
+from typing import Optional, Callable, Dict, Sequence
 
 import networkx as nx
 import numpy as np
@@ -11,10 +12,16 @@ from golem.metrics.graph_metrics import min_max
 from libs.netcomp import edit_distance
 
 
-def tree_edit_dist(target_graph: nx.DiGraph, graph: nx.DiGraph) -> float:
+def _label_dist(label1: str, label2: str) -> int:
+    return int(label1 != label2)
+
+
+def tree_edit_dist(target_graph: nx.DiGraph, graph: nx.DiGraph,
+                   with_node_substitute_dist: bool = True) -> float:
+    label_dist = _label_dist if with_node_substitute_dist else lambda x, y: 1
     target_tree_root = _nx_to_zss_tree(target_graph)
     cmp_tree_root = _nx_to_zss_tree(graph)
-    dist = zss.simple_distance(target_tree_root, cmp_tree_root)
+    dist = zss.simple_distance(target_tree_root, cmp_tree_root, label_dist=label_dist)
     return dist
 
 
@@ -31,7 +38,7 @@ def _nx_to_zss_tree(graph: nx.DiGraph) -> zss.Node:
     return nodes_dict[root]
 
 
-def _get_root_node(nxgraph: nx.DiGraph):
+def _get_root_node(nxgraph: nx.DiGraph) -> Sequence:
     source = [n for (n, d) in nxgraph.in_degree() if d == 0][0]
     return source
 
@@ -82,6 +89,8 @@ def try_tree_edit_distance():
         duration = datetime.now() - start_time
 
         print(f'iter {i} with size={n} dist={dist}, t={duration.total_seconds():.3f}s')
+        from examples.synthetic_graph_evolution.utils import draw_graphs_subplots
+        draw_graphs_subplots(g1, g2)
 
 
 if __name__ == "__main__":

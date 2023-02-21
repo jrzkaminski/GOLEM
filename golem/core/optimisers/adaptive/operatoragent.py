@@ -38,7 +38,8 @@ class ExperienceBuffer:
         # TODO: store this action in correct format in ParentOperators.operators
         action = result.parent_operator.operators[0]
         prev_fitness = result.parent_operator.parent_individuals[0].fitness.value
-        reward = result.fitness.value - prev_fitness if prev_fitness is not None else 0.
+        # we're minimising the fitness, that's why less is better
+        reward = prev_fitness - result.fitness.value if prev_fitness is not None else 0.
         self.log_experience(obs, action, reward)
 
     def log_invalid(self, obs: Individual, action: ActType):
